@@ -13,6 +13,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import notiz.app.test.DatabaseConnection;
 
 /**
  *
@@ -40,6 +41,8 @@ public class GUI extends javax.swing.JFrame {
     }
     boolean print = true;
 
+    ArrayList<String> ordnerNamen = new ArrayList();
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -55,17 +58,16 @@ public class GUI extends javax.swing.JFrame {
         PKaddTf = new javax.swing.JTextField();
         PKaddBtnCancel = new javax.swing.JButton();
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList<>();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        scOrdner = new javax.swing.JScrollPane();
+        lOrdner = new javax.swing.JList<>();
+        spNotizen = new javax.swing.JScrollPane();
+        lNotizen = new javax.swing.JList<>();
+        btnopenPKadd = new javax.swing.JButton();
+        btnRemoveOrdner = new javax.swing.JButton();
 
-        PKadd.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         PKadd.setAlwaysOnTop(true);
+        PKadd.setLocation(new java.awt.Point(100, 100));
         PKadd.setSize(new java.awt.Dimension(400, 300));
-        PKadd.setType(java.awt.Window.Type.POPUP);
 
         jLabel1.setText("kategorie");
 
@@ -73,6 +75,12 @@ public class GUI extends javax.swing.JFrame {
         PKaddBtnAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PKaddBtnAddActionPerformed(evt);
+            }
+        });
+
+        PKaddTf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PKaddTfActionPerformed(evt);
             }
         });
 
@@ -105,7 +113,7 @@ public class GUI extends javax.swing.JFrame {
         PKaddLayout.setVerticalGroup(
             PKaddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PKaddLayout.createSequentialGroup()
-                .addContainerGap(66, Short.MAX_VALUE)
+                .addContainerGap(65, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(PKaddTf, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -149,32 +157,29 @@ public class GUI extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        jList1.setModel(new DefaultListModel<String>());
-        jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+        lOrdner.setModel(new DefaultListModel<String>());
+        lOrdner.setToolTipText("");
+        lOrdner.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList1ValueChanged(evt);
+                lOrdnerValueChanged(evt);
             }
         });
-        jScrollPane3.setViewportView(jList1);
+        scOrdner.setViewportView(lOrdner);
 
-        jList2.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Notiz1", "Notiz2", "Notiz3", "Notiz4", "Notiz5", " " };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane4.setViewportView(jList2);
+        lNotizen.setModel(new DefaultListModel<String>());
+        spNotizen.setViewportView(lNotizen);
 
-        jButton1.setText("add");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnopenPKadd.setText("add");
+        btnopenPKadd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnopenPKaddActionPerformed(evt);
             }
         });
 
-        jButton2.setText("remove");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnRemoveOrdner.setText("remove");
+        btnRemoveOrdner.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnRemoveOrdnerActionPerformed(evt);
             }
         });
 
@@ -186,15 +191,15 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(btnopenPKadd)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2)))
+                        .addComponent(btnRemoveOrdner)))
                 .addContainerGap(463, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -202,58 +207,69 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(236, 236, 236)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(btnopenPKadd)
+                    .addComponent(btnRemoveOrdner))
                 .addContainerGap(283, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jInternalFrame1InternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_jInternalFrame1InternalFrameClosing
-        
-    }//GEN-LAST:event_jInternalFrame1InternalFrameClosing
-
-    private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
-        //if(true){
-                    String selectedValue = jList1.getSelectedValue();
-                    // Führen Sie die gewünschte Aktion aus
-                    System.out.println("Ausgewählter Eintrag: " + selectedValue);
-        //}
-        print=!print;
-        
-        
-        // Holen Sie sich das Modell der JList
-DefaultListModel<String> model = (DefaultListModel<String>) jList1.getModel();
-
-// Fügen Sie Elemente hinzu
-model.addElement("Eintrag 1");
-model.addElement("Eintrag 2");
-model.addElement("Eintrag 3");
-    }//GEN-LAST:event_jList1ValueChanged
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnopenPKaddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnopenPKaddActionPerformed
         PKadd.show();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnopenPKaddActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnRemoveOrdnerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveOrdnerActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnRemoveOrdnerActionPerformed
 
     private void PKaddBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddBtnAddActionPerformed
-        System.out.println(PKaddTf.getText().trim());
+        String neuerOrdner = PKaddTf.getText().trim();
+        System.out.println(neuerOrdner);
+        ordnerNamen.add(neuerOrdner);
+        DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
+        model.addElement(neuerOrdner);
+        PKaddTf.setText("");
     }//GEN-LAST:event_PKaddBtnAddActionPerformed
 
     private void PKaddBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddBtnCancelActionPerformed
+        PKaddTf.setText("");
         PKadd.hide();
     }//GEN-LAST:event_PKaddBtnCancelActionPerformed
+
+    private void lOrdnerValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lOrdnerValueChanged
+        if(print == true){
+            String selectedValue = lOrdner.getSelectedValue();
+            // Führen Sie die gewünschte Aktion aus
+            System.out.println("Ausgewählter Eintrag: " + selectedValue);
+            
+            DefaultListModel<String> notizenListe = (DefaultListModel<String>) lNotizen.getModel();
+            notizenListe.addElement("Eintrag 1");
+            notizenListe.addElement("Eintrag 2");
+            notizenListe.addElement("Eintrag 3");
+        }
+        print =! print;
+
+        /*
+
+        // Fügen Sie Elemente hinzu
+        */
+    }//GEN-LAST:event_lOrdnerValueChanged
+
+    private void jInternalFrame1InternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_jInternalFrame1InternalFrameClosing
+
+    }//GEN-LAST:event_jInternalFrame1InternalFrameClosing
+
+    private void PKaddTfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddTfActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_PKaddTfActionPerformed
 
     /**
      * @param args the command line arguments
@@ -295,13 +311,13 @@ model.addElement("Eintrag 3");
     private javax.swing.JButton PKaddBtnAdd;
     private javax.swing.JButton PKaddBtnCancel;
     private javax.swing.JTextField PKaddTf;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnRemoveOrdner;
+    private javax.swing.JButton btnopenPKadd;
     private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList<String> jList1;
-    private javax.swing.JList<String> jList2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JList<String> lNotizen;
+    private javax.swing.JList<String> lOrdner;
+    private javax.swing.JScrollPane scOrdner;
+    private javax.swing.JScrollPane spNotizen;
     // End of variables declaration//GEN-END:variables
 }
