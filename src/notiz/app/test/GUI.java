@@ -13,6 +13,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import notiz.app.test.DatabaseConnection;
 
 /**
  *
@@ -38,9 +39,11 @@ public class GUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(rootPane, "Fehler! Verbindung konnte nicht aufgebaut werden: " + ex);
         }
     }
-    boolean print = true;
-
-    ArrayList<String> ordnerNamen = new ArrayList();
+    boolean printOrdner = true;
+    boolean printNotiz = true;
+    
+    ArrayList<Ordner> ordnerArrayListe = new ArrayList();
+    ArrayList<Notiz> notizenArrayListe = new ArrayList();
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -51,29 +54,41 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        PKadd = new javax.swing.JDialog();
+        pkOrdnerErstellen = new javax.swing.JDialog();
         jLabel1 = new javax.swing.JLabel();
-        PKaddBtnAdd = new javax.swing.JButton();
+        btnPKOrdnerErstellen = new javax.swing.JButton();
         PKaddTf = new javax.swing.JTextField();
-        PKaddBtnCancel = new javax.swing.JButton();
-        jInternalFrame1 = new javax.swing.JInternalFrame();
+        btnPKSchliessen = new javax.swing.JButton();
+        pkNotizErstellen = new javax.swing.JDialog();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        taNotizErstellen = new javax.swing.JTextArea();
+        btnPKNotizErstellen = new javax.swing.JButton();
+        btnPKNotizErstellenAbbrechen = new javax.swing.JButton();
+        tfNotizErstellenTitel = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         scOrdner = new javax.swing.JScrollPane();
         lOrdner = new javax.swing.JList<>();
         spNotizen = new javax.swing.JScrollPane();
         lNotizen = new javax.swing.JList<>();
         btnopenPKadd = new javax.swing.JButton();
         btnRemoveOrdner = new javax.swing.JButton();
+        btnNotizErstellen = new javax.swing.JButton();
+        btnNotizLoeschen = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        taNotizInhalt = new javax.swing.JTextArea();
+        btnNoitzBearbeiten = new javax.swing.JButton();
 
-        PKadd.setAlwaysOnTop(true);
-        PKadd.setLocation(new java.awt.Point(100, 100));
-        PKadd.setSize(new java.awt.Dimension(400, 300));
+        pkOrdnerErstellen.setAlwaysOnTop(true);
+        pkOrdnerErstellen.setLocation(new java.awt.Point(100, 100));
+        pkOrdnerErstellen.setSize(new java.awt.Dimension(400, 300));
 
         jLabel1.setText("kategorie");
 
-        PKaddBtnAdd.setText("add");
-        PKaddBtnAdd.addActionListener(new java.awt.event.ActionListener() {
+        btnPKOrdnerErstellen.setText("add");
+        btnPKOrdnerErstellen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PKaddBtnAddActionPerformed(evt);
+                btnPKOrdnerErstellenActionPerformed(evt);
             }
         });
 
@@ -83,78 +98,119 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        PKaddBtnCancel.setText("cancel");
-        PKaddBtnCancel.addActionListener(new java.awt.event.ActionListener() {
+        btnPKSchliessen.setText("cancel");
+        btnPKSchliessen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PKaddBtnCancelActionPerformed(evt);
+                btnPKSchliessenActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout PKaddLayout = new javax.swing.GroupLayout(PKadd.getContentPane());
-        PKadd.getContentPane().setLayout(PKaddLayout);
-        PKaddLayout.setHorizontalGroup(
-            PKaddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PKaddLayout.createSequentialGroup()
-                .addGroup(PKaddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(PKaddLayout.createSequentialGroup()
+        javax.swing.GroupLayout pkOrdnerErstellenLayout = new javax.swing.GroupLayout(pkOrdnerErstellen.getContentPane());
+        pkOrdnerErstellen.getContentPane().setLayout(pkOrdnerErstellenLayout);
+        pkOrdnerErstellenLayout.setHorizontalGroup(
+            pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
+                .addGroup(pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
                         .addGap(145, 145, 145)
                         .addComponent(jLabel1))
-                    .addGroup(PKaddLayout.createSequentialGroup()
+                    .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
                         .addGap(43, 43, 43)
-                        .addGroup(PKaddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(PKaddLayout.createSequentialGroup()
-                                .addComponent(PKaddBtnAdd)
+                        .addGroup(pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
+                                .addComponent(btnPKOrdnerErstellen)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(PKaddBtnCancel))
+                                .addComponent(btnPKSchliessen))
                             .addComponent(PKaddTf, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(114, Short.MAX_VALUE))
         );
-        PKaddLayout.setVerticalGroup(
-            PKaddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PKaddLayout.createSequentialGroup()
+        pkOrdnerErstellenLayout.setVerticalGroup(
+            pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pkOrdnerErstellenLayout.createSequentialGroup()
                 .addContainerGap(65, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(PKaddTf, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28)
-                .addGroup(PKaddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(PKaddBtnAdd)
-                    .addComponent(PKaddBtnCancel))
+                .addGroup(pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPKOrdnerErstellen)
+                    .addComponent(btnPKSchliessen))
                 .addGap(78, 78, 78))
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        taNotizErstellen.setColumns(20);
+        taNotizErstellen.setRows(5);
+        jScrollPane2.setViewportView(taNotizErstellen);
 
-        jInternalFrame1.setClosable(true);
-        jInternalFrame1.setVisible(false);
-        jInternalFrame1.addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-                jInternalFrame1InternalFrameClosing(evt);
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+        btnPKNotizErstellen.setText("erstellen");
+        btnPKNotizErstellen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPKNotizErstellenActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
-        jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
-        jInternalFrame1Layout.setHorizontalGroup(
-            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        btnPKNotizErstellenAbbrechen.setText("abbrechen");
+        btnPKNotizErstellenAbbrechen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPKNotizErstellenAbbrechenActionPerformed(evt);
+            }
+        });
+
+        tfNotizErstellenTitel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfNotizErstellenTitelActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setText("Titel:");
+
+        jLabel3.setText("Inhalt:");
+
+        javax.swing.GroupLayout pkNotizErstellenLayout = new javax.swing.GroupLayout(pkNotizErstellen.getContentPane());
+        pkNotizErstellen.getContentPane().setLayout(pkNotizErstellenLayout);
+        pkNotizErstellenLayout.setHorizontalGroup(
+            pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
+                .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pkNotizErstellenLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2)
+                            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
+                                .addComponent(btnPKNotizErstellen)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnPKNotizErstellenAbbrechen)
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(pkNotizErstellenLayout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfNotizErstellenTitel, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 168, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        jInternalFrame1Layout.setVerticalGroup(
-            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        pkNotizErstellenLayout.setVerticalGroup(
+            pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfNotizErstellenTitel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPKNotizErstellen)
+                    .addComponent(btnPKNotizErstellenAbbrechen))
+                .addContainerGap())
         );
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lOrdner.setModel(new DefaultListModel<String>());
         lOrdner.setToolTipText("");
@@ -166,19 +222,47 @@ public class GUI extends javax.swing.JFrame {
         scOrdner.setViewportView(lOrdner);
 
         lNotizen.setModel(new DefaultListModel<String>());
+        lNotizen.setDragEnabled(true);
+        lNotizen.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                lNotizenValueChanged(evt);
+            }
+        });
         spNotizen.setViewportView(lNotizen);
 
-        btnopenPKadd.setText("add");
+        btnopenPKadd.setText("Ordner erstellen");
         btnopenPKadd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnopenPKaddActionPerformed(evt);
             }
         });
 
-        btnRemoveOrdner.setText("remove");
+        btnRemoveOrdner.setText("Ordner löschen");
         btnRemoveOrdner.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRemoveOrdnerActionPerformed(evt);
+            }
+        });
+
+        btnNotizErstellen.setText("Notiz erstellen");
+        btnNotizErstellen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNotizErstellenActionPerformed(evt);
+            }
+        });
+
+        btnNotizLoeschen.setText("Notiz löschen");
+
+        taNotizInhalt.setEditable(false);
+        taNotizInhalt.setColumns(20);
+        taNotizInhalt.setRows(5);
+        jScrollPane1.setViewportView(taNotizInhalt);
+        taNotizInhalt.getAccessibleContext().setAccessibleDescription("");
+
+        btnNoitzBearbeiten.setText("bearbeiten");
+        btnNoitzBearbeiten.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNoitzBearbeitenActionPerformed(evt);
             }
         });
 
@@ -189,87 +273,141 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnopenPKadd)
+                    .addComponent(btnRemoveOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnNotizErstellen)
+                            .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(btnopenPKadd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRemoveOrdner)))
-                .addContainerGap(463, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnNoitzBearbeiten)))
+                    .addComponent(btnNotizLoeschen, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(65, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(236, 236, 236)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnNoitzBearbeiten)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnopenPKadd)
-                    .addComponent(btnRemoveOrdner))
-                .addContainerGap(283, Short.MAX_VALUE))
+                    .addComponent(btnNotizErstellen))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRemoveOrdner)
+                    .addComponent(btnNotizLoeschen))
+                .addContainerGap(254, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnopenPKaddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnopenPKaddActionPerformed
-        PKadd.show();
+        pkOrdnerErstellen.show();
     }//GEN-LAST:event_btnopenPKaddActionPerformed
 
     private void btnRemoveOrdnerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveOrdnerActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnRemoveOrdnerActionPerformed
 
-    private void PKaddBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddBtnAddActionPerformed
+    private void btnPKOrdnerErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKOrdnerErstellenActionPerformed
         String neuerOrdner = PKaddTf.getText().trim();
-        System.out.println(neuerOrdner);
-        ordnerNamen.add(neuerOrdner);
+        Ordner newOrdner = new Ordner(neuerOrdner);
+        System.out.println("Objekt Ordner Name:" + newOrdner.getName());
+        ordnerArrayListe.add(newOrdner);
+        
         DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
-        model.addElement(neuerOrdner);
+        model.addElement(newOrdner.getName());
         PKaddTf.setText("");
-    }//GEN-LAST:event_PKaddBtnAddActionPerformed
+        pkOrdnerErstellen.hide();
+    }//GEN-LAST:event_btnPKOrdnerErstellenActionPerformed
 
-    private void PKaddBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddBtnCancelActionPerformed
+    private void btnPKSchliessenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKSchliessenActionPerformed
         PKaddTf.setText("");
-        PKadd.hide();
-    }//GEN-LAST:event_PKaddBtnCancelActionPerformed
+        pkOrdnerErstellen.hide();
+    }//GEN-LAST:event_btnPKSchliessenActionPerformed
 
     private void lOrdnerValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lOrdnerValueChanged
-        if(print == true){
+        if(printOrdner == true){
             String selectedValue = lOrdner.getSelectedValue();
             // Führen Sie die gewünschte Aktion aus
             System.out.println("Ausgewählter Eintrag: " + selectedValue);
             
             DefaultListModel<String> notizenListe = (DefaultListModel<String>) lNotizen.getModel();
-            notizenListe.addElement("Eintrag 1");
-            notizenListe.addElement("Eintrag 2");
-            notizenListe.addElement("Eintrag 3");
+            notizenListe.clear();
+            taNotizInhalt.setText("");
+            
+            for(int i = 0; i<notizenArrayListe.size(); i++){
+                if(notizenArrayListe.get(i).getName() == selectedValue){
+                    notizenListe.addElement(notizenArrayListe.get(i).getTitle());
+                    lNotizen.setSelectedValue(ABORT, printOrdner);
+                    taNotizInhalt.setText(notizenArrayListe.get(i).getContent());
+                }
+            }
+            
         }
-        print =! print;
-
-        /*
-
-        // Fügen Sie Elemente hinzu
-        */
+        printOrdner =! printOrdner;
     }//GEN-LAST:event_lOrdnerValueChanged
-
-    private void jInternalFrame1InternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_jInternalFrame1InternalFrameClosing
-
-    }//GEN-LAST:event_jInternalFrame1InternalFrameClosing
 
     private void PKaddTfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddTfActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_PKaddTfActionPerformed
+
+    private void btnNoitzBearbeitenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNoitzBearbeitenActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNoitzBearbeitenActionPerformed
+
+    private void btnNotizErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotizErstellenActionPerformed
+        pkNotizErstellen.show();
+    }//GEN-LAST:event_btnNotizErstellenActionPerformed
+
+    private void btnPKNotizErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKNotizErstellenActionPerformed
+        String ausgewaehlterOrdner = lOrdner.getSelectedValue();
+        String content =  taNotizErstellen.getText();
+        String title = tfNotizErstellenTitel.getText();
+        
+        Notiz neueNotiz = new Notiz(ausgewaehlterOrdner, title, content);
+        notizenArrayListe.add(neueNotiz);
+        
+        taNotizErstellen.setText("");
+        pkNotizErstellen.hide();
+    }//GEN-LAST:event_btnPKNotizErstellenActionPerformed
+
+    private void btnPKNotizErstellenAbbrechenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKNotizErstellenAbbrechenActionPerformed
+        pkNotizErstellen.hide();
+    }//GEN-LAST:event_btnPKNotizErstellenAbbrechenActionPerformed
+
+    private void tfNotizErstellenTitelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNotizErstellenTitelActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfNotizErstellenTitelActionPerformed
+
+    private void lNotizenValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lNotizenValueChanged
+        if(printNotiz == true){
+            String selectedValue = lNotizen.getSelectedValue();
+            // Führen Sie die gewünschte Aktion aus
+            System.out.println("Ausgewählter Eintrag: " + selectedValue);
+            
+            for (int i = 0; i < notizenArrayListe.size(); i++) {
+                if(notizenArrayListe.get(i).getTitle().equals(selectedValue)){
+                    taNotizInhalt.setText(notizenArrayListe.get(i).getContent());
+                }
+            }
+        }
+        printNotiz =! printNotiz;
+    }//GEN-LAST:event_lNotizenValueChanged
 
     /**
      * @param args the command line arguments
@@ -307,17 +445,29 @@ public class GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JDialog PKadd;
-    private javax.swing.JButton PKaddBtnAdd;
-    private javax.swing.JButton PKaddBtnCancel;
     private javax.swing.JTextField PKaddTf;
+    private javax.swing.JButton btnNoitzBearbeiten;
+    private javax.swing.JButton btnNotizErstellen;
+    private javax.swing.JButton btnNotizLoeschen;
+    private javax.swing.JButton btnPKNotizErstellen;
+    private javax.swing.JButton btnPKNotizErstellenAbbrechen;
+    private javax.swing.JButton btnPKOrdnerErstellen;
+    private javax.swing.JButton btnPKSchliessen;
     private javax.swing.JButton btnRemoveOrdner;
     private javax.swing.JButton btnopenPKadd;
-    private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList<String> lNotizen;
     private javax.swing.JList<String> lOrdner;
+    private javax.swing.JDialog pkNotizErstellen;
+    private javax.swing.JDialog pkOrdnerErstellen;
     private javax.swing.JScrollPane scOrdner;
     private javax.swing.JScrollPane spNotizen;
+    private javax.swing.JTextArea taNotizErstellen;
+    private javax.swing.JTextArea taNotizInhalt;
+    private javax.swing.JTextField tfNotizErstellenTitel;
     // End of variables declaration//GEN-END:variables
 }
