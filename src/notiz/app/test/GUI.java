@@ -4,10 +4,13 @@
  */
 package notiz.app.test;
 
+import com.mysql.jdbc.PreparedStatement;
 import notiz.app.test.DatabaseConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.DefaultListModel;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -21,8 +24,8 @@ import notiz.app.test.DatabaseConnection;
  */
 public class GUI extends javax.swing.JFrame {
     
-    
-        private DatabaseConnection konnektor;
+    public ResultSet result;
+    private DatabaseConnection konnektor;
 
     /**
      * Creates new form GUI
@@ -38,12 +41,77 @@ public class GUI extends javax.swing.JFrame {
         } catch (ClassNotFoundException | SQLException ex) {
             JOptionPane.showMessageDialog(rootPane, "Fehler! Verbindung konnte nicht aufgebaut werden: " + ex);
         }
+        
+        initOrdner();
+        
     }
-    boolean printOrdner = true;
-    boolean printNotiz = true;
     
     ArrayList<Ordner> ordnerArrayListe = new ArrayList();
     ArrayList<Notiz> notizenArrayListe = new ArrayList();
+
+    
+    public void initNotizen(String ordnerName){
+    try {
+        result = this.konnektor.fuehreAbfrageAus("SELECT n.Titel, n.Inhalt FROM notiz n JOIN Ordner o ON n.Ordner_ID = o.Ordner_ID JOIN user u ON o.Benutzername = u.Benutzername WHERE u.Benutzername = '" + login.uebergebeuser().getUsername() + "' AND o.Name = '" + ordnerName + "';");
+        while(result.next()) {
+            String titel = result.getString("Titel");
+            String inhalt = result.getString("Inhalt");
+            System.out.println(titel + inhalt);
+            Notiz notiz = new Notiz(ordnerName, titel, inhalt);
+            notizenArrayListe.add(notiz);
+        }
+    } catch(SQLException ex){
+        JOptionPane.showMessageDialog(rootPane, "Error during database query:" + ex);
+    }
+}
+    
+    public void initOrdner() {
+    try {
+        // SQL-Abfrage, um die Ordner aus der Datenbank zu laden
+        result = this.konnektor.fuehreAbfrageAus("SELECT `Name` FROM `Ordner`;");
+
+        // Das Modell der JList für die Ordner holen
+        DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
+        model.clear(); // Das Modell leeren, bevor neue Elemente hinzugefügt werden
+
+        // Die Ergebnisse der Abfrage durchlaufen
+        while (result.next()) {
+            // Ordnername aus dem ResultSet holen
+            String ordnerName = result.getString("Name");
+
+            // Neuen Ordner erstellen und zur ArrayListe hinzufügen
+            Ordner ordner = new Ordner(ordnerName);
+            ordnerArrayListe.add(ordner);
+
+            // Den Ordner zur JList hinzufügen
+            model.addElement(ordner.getName());
+        }
+    } catch (SQLException ex) {
+        // Fehlermeldung anzeigen, wenn die Abfrage fehlschlägt
+        JOptionPane.showMessageDialog(rootPane, "Fehler bei der Datenbankabfrage: " + ex);
+    }
+}
+    
+    public int getOrdner_ID(String ordnerName){
+        int ordner_ID = 0;
+        
+        try {
+            result = this.konnektor.fuehreAbfrageAus("SELECT `Ordner_ID` FROM `Ordner` WHERE `Name` = '" + ordnerName + "';");
+            if(result.next()){
+                ordner_ID = Integer.parseInt(result.getString("Ordner_ID"));
+            }
+        }catch (SQLException ex){
+        // Fehlermeldung anzeigen, wenn die Abfrage fehlschlägt
+        JOptionPane.showMessageDialog(rootPane, "Fehler bei der Datenbankabfrage für den Ordner_ID: " + ex);
+    }
+        
+        return ordner_ID;
+    }
+
+
+    
+    boolean printOrdner = true;
+    boolean printNotiz = true;
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -214,6 +282,15 @@ public class GUI extends javax.swing.JFrame {
 
         lOrdner.setModel(new DefaultListModel<String>());
         lOrdner.setToolTipText("");
+        lOrdner.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                lOrdnerAncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
         lOrdner.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 lOrdnerValueChanged(evt);
@@ -324,15 +401,31 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRemoveOrdnerActionPerformed
 
     private void btnPKOrdnerErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKOrdnerErstellenActionPerformed
-        String neuerOrdner = PKaddTf.getText().trim();
-        Ordner newOrdner = new Ordner(neuerOrdner);
-        System.out.println("Objekt Ordner Name:" + newOrdner.getName());
-        ordnerArrayListe.add(newOrdner);
+        String neuerOrdnerName = PKaddTf.getText().trim();
+    if (neuerOrdnerName.isEmpty()) {
+        JOptionPane.showMessageDialog(rootPane, "Bitte geben Sie einen Ordnernamen ein.");
+        return;
+    }
+
+    Ordner newOrdner = new Ordner(neuerOrdnerName);
+    System.out.println("Objekt Ordner Name:" + newOrdner.getName());
+
+    // Füge den neuen Ordner in die Datenbank ein
+    try {
+        String benutzername = login.uebergebeuser().getName();
+        int ergebnis = konnektor.fuehreUpdateAus("INSERT INTO `Ordner` (`Name`, `Benutzername`) VALUES ('"+neuerOrdnerName+"', '"+benutzername+"');");
         
+        // Ordner zur ArrayList und zum GUI-Model hinzufügen
+        ordnerArrayListe.add(newOrdner);
         DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
         model.addElement(newOrdner.getName());
         PKaddTf.setText("");
         pkOrdnerErstellen.hide();
+        
+        JOptionPane.showMessageDialog(rootPane, "Ordner erfolgreich hinzugefügt!");
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen des Ordners in die Datenbank: " + ex.getMessage());
+    }
     }//GEN-LAST:event_btnPKOrdnerErstellenActionPerformed
 
     private void btnPKSchliessenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKSchliessenActionPerformed
@@ -343,21 +436,18 @@ public class GUI extends javax.swing.JFrame {
     private void lOrdnerValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lOrdnerValueChanged
         if(printOrdner == true){
             String selectedValue = lOrdner.getSelectedValue();
+            notizenArrayListe.clear();
+            initNotizen(selectedValue);
             // Führen Sie die gewünschte Aktion aus
             System.out.println("Ausgewählter Eintrag: " + selectedValue);
             
             DefaultListModel<String> notizenListe = (DefaultListModel<String>) lNotizen.getModel();
             notizenListe.clear();
-            taNotizInhalt.setText("");
+            taNotizInhalt.setText("keine Notiz ausgewählt");
             
             for(int i = 0; i<notizenArrayListe.size(); i++){
-                if(notizenArrayListe.get(i).getName() == selectedValue){
-                    notizenListe.addElement(notizenArrayListe.get(i).getTitle());
-                    lNotizen.setSelectedValue(ABORT, printOrdner);
-                    taNotizInhalt.setText(notizenArrayListe.get(i).getContent());
-                }
+                notizenListe.addElement(notizenArrayListe.get(i).getTitle());
             }
-            
         }
         printOrdner =! printOrdner;
     }//GEN-LAST:event_lOrdnerValueChanged
@@ -378,9 +468,24 @@ public class GUI extends javax.swing.JFrame {
         String ausgewaehlterOrdner = lOrdner.getSelectedValue();
         String content =  taNotizErstellen.getText();
         String title = tfNotizErstellenTitel.getText();
+        Date erstelldatum = new Date();
+        Date aenderungsdatum = erstelldatum;
         
         Notiz neueNotiz = new Notiz(ausgewaehlterOrdner, title, content);
         notizenArrayListe.add(neueNotiz);
+        DefaultListModel<String> notizenListe = (DefaultListModel<String>) lNotizen.getModel();
+        notizenListe.addElement(title);
+        taNotizInhalt.setText(content);
+        
+        try {
+            
+        int ergebnis = konnektor.fuehreUpdateAus("INSERT INTO `notiz` (`Titel`, `Inhalt`, `Ordner_ID`) VALUES ('"+title+"', '"+content+"', "+getOrdner_ID(ausgewaehlterOrdner)+");");
+        
+        JOptionPane.showMessageDialog(rootPane, "Notiz erfolgreich hinzugefügt!");
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen der Notiz in die Datenbank: " + ex.getMessage());
+    }
+    
         
         taNotizErstellen.setText("");
         pkNotizErstellen.hide();
@@ -408,6 +513,10 @@ public class GUI extends javax.swing.JFrame {
         }
         printNotiz =! printNotiz;
     }//GEN-LAST:event_lNotizenValueChanged
+
+    private void lOrdnerAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_lOrdnerAncestorAdded
+        
+    }//GEN-LAST:event_lOrdnerAncestorAdded
 
     /**
      * @param args the command line arguments

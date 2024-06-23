@@ -4,6 +4,7 @@
  */
 package notiz.app.test;
 
+
 /**
  *
  * @author julius
@@ -14,8 +15,8 @@ class Notiz extends Ordner {
 
     public Notiz(String ordnerName, String title, String content) {
         super(ordnerName);
-        this.content = content;
         this.title = title;
+        this.content = content;
     }
     
     public String getTitle() {
