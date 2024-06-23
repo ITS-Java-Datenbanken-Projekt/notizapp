@@ -30,8 +30,13 @@ public class DatabaseConnection {
         verbindung.close();
     }
 
+    public int fuehreUpdateAus(String sqlBefehl) throws SQLException {
+        Statement sqlStatement = verbindung.createStatement();
+        int result = sqlStatement.executeUpdate(sqlBefehl);
+        return result;
+    }
+    
     public ResultSet fuehreAbfrageAus(String sqlBefehl) throws SQLException {
-
         Statement sqlStatement = verbindung.createStatement();
         ResultSet rs = sqlStatement.executeQuery(sqlBefehl);
 
