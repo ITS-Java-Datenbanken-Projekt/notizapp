@@ -14,9 +14,8 @@ public class NotizAppTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        GUI gui = new GUI();
-        gui.setVisible(true);
-        
+        login login = new login();
+        login.setVisible(true);
     }
     
 }
