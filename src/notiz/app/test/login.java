@@ -20,6 +20,7 @@ public class login extends javax.swing.JFrame {
     private DatabaseConnection konnektor;
     public static user currentuser;
     public ResultSet result;
+    public ResultSet ergebnis;
     
     /**
     private boolean checkPasswordMatch(){        
@@ -177,6 +178,7 @@ public class login extends javax.swing.JFrame {
         panel3 = new java.awt.Panel();
         jLabel7 = new javax.swing.JLabel();
         btnCreateAccountUserOK1 = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         userTf = new javax.swing.JTextField();
         pwField = new javax.swing.JPasswordField();
@@ -291,6 +293,7 @@ public class login extends javax.swing.JFrame {
         });
 
         LStatus.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        LStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         jLabel8.setFont(new java.awt.Font("Arial", 1, 28)); // NOI18N
         jLabel8.setText("CREATE ACCOUNT");
@@ -322,7 +325,6 @@ public class login extends javax.swing.JFrame {
                     .addComponent(Lpw))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(LStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panel1Layout.createSequentialGroup()
                         .addComponent(btnPCAconfirm)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
@@ -333,6 +335,9 @@ public class login extends javax.swing.JFrame {
                     .addComponent(pwfPWconfirm)
                     .addComponent(showPasswordChk1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(panel1Layout.createSequentialGroup()
+                .addComponent(LStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panel1Layout.setVerticalGroup(
             panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -359,11 +364,11 @@ public class login extends javax.swing.JFrame {
                 .addComponent(showPasswordChk1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(LStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnPCAcancel)
                     .addComponent(btnPCAconfirm))
-                .addGap(30, 30, 30))
+                .addGap(19, 19, 19))
         );
 
         javax.swing.GroupLayout PCreateAccountLayout = new javax.swing.GroupLayout(PCreateAccount.getContentPane());
@@ -383,11 +388,12 @@ public class login extends javax.swing.JFrame {
 
         PCreateAccountUser.setIconImage(new ImageIcon(getClass().getResource("/notiz/app/test/source/icon.png")).getImage());
         PCreateAccountUser.setModal(true);
+        PCreateAccountUser.setResizable(false);
 
         panel2.setBackground(new java.awt.Color(204, 204, 204));
 
         jLabel2.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        jLabel2.setText("this username is already taken");
+        jLabel2.setText("This username is already taken");
 
         btnCreateAccountUserOK.setBackground(java.awt.Color.lightGray);
         btnCreateAccountUserOK.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
@@ -501,10 +507,13 @@ public class login extends javax.swing.JFrame {
         PCreateAccountUserC.getAccessibleContext().setAccessibleName("ACCOUNT CREATED");
         PCreateAccountUserC.getAccessibleContext().setAccessibleDescription("");
 
+        jLabel9.setText("jLabel9");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JMM NOTE LOGIN");
         setIconImage(new ImageIcon(getClass().getResource("/notiz/app/test/source/icon.png")).getImage());
         setLocation(new java.awt.Point(800, 400));
+        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -665,7 +674,10 @@ public class login extends javax.swing.JFrame {
         if (getUser(userTf.getText())){
             GUI gui = new GUI();
             gui.setVisible(true);
-            dispose();            
+            dispose();  
+        }
+        else{
+            JOptionPane.showMessageDialog(rootPane, "Username or password wrong");
         }
 
         
@@ -835,6 +847,7 @@ public class login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton loginBtn;
     private java.awt.Panel panel1;
