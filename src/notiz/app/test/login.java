@@ -18,7 +18,7 @@ public class login extends javax.swing.JFrame {
      */
     
     private DatabaseConnection konnektor;
-    public user currentuser;
+    public static user currentuser;
     public ResultSet result;
     
     /**
@@ -139,6 +139,9 @@ public class login extends javax.swing.JFrame {
     }
        
 
+    public static user uebergebeuser() {
+        return currentuser;
+    }
     
      
 

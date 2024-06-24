@@ -41,7 +41,7 @@ public class GUI extends javax.swing.JFrame {
         } catch (ClassNotFoundException | SQLException ex) {
             JOptionPane.showMessageDialog(rootPane, "Fehler! Verbindung konnte nicht aufgebaut werden: " + ex);
         }
-        
+        lUsername.setText(login.uebergebeuser().getName());
         initOrdner();
         
     }
@@ -68,7 +68,7 @@ public class GUI extends javax.swing.JFrame {
     public void initOrdner() {
     try {
         // SQL-Abfrage, um die Ordner aus der Datenbank zu laden
-        result = this.konnektor.fuehreAbfrageAus("SELECT `Name` FROM `Ordner`;");
+        result = this.konnektor.fuehreAbfrageAus("SELECT `Name` FROM `Ordner` WHERE Benutzername = '"+ login.uebergebeuser().getUsername()+ "';");
 
         // Das Modell der JList für die Ordner holen
         DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
@@ -123,26 +123,36 @@ public class GUI extends javax.swing.JFrame {
     private void initComponents() {
 
         pkOrdnerErstellen = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         btnPKOrdnerErstellen = new javax.swing.JButton();
         PKaddTf = new javax.swing.JTextField();
         btnPKSchliessen = new javax.swing.JButton();
         pkNotizErstellen = new javax.swing.JDialog();
+        jPanel3 = new javax.swing.JPanel();
+        tfNotizErstellenTitel = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         taNotizErstellen = new javax.swing.JTextArea();
         btnPKNotizErstellen = new javax.swing.JButton();
         btnPKNotizErstellenAbbrechen = new javax.swing.JButton();
-        tfNotizErstellenTitel = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        label1 = new java.awt.Label();
         pkNotizBearbeiten = new javax.swing.JDialog();
-        tfTitel = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         taNotizBearbeiten = new javax.swing.JTextArea();
         btnNotizBearbeitenSpeichern = new javax.swing.JButton();
         btnNotizBearbeitenAbbrechen = new javax.swing.JButton();
+        tfTitel = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        btnNotizLoeschen = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        taNotizInhalt = new javax.swing.JTextArea();
+        btnNoitzBearbeiten = new javax.swing.JButton();
         scOrdner = new javax.swing.JScrollPane();
         lOrdner = new javax.swing.JList<>();
         spNotizen = new javax.swing.JScrollPane();
@@ -150,19 +160,25 @@ public class GUI extends javax.swing.JFrame {
         btnopenPKadd = new javax.swing.JButton();
         btnRemoveOrdner = new javax.swing.JButton();
         btnNotizErstellen = new javax.swing.JButton();
-        btnNotizLoeschen = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        taNotizInhalt = new javax.swing.JTextArea();
-        btnNoitzBearbeiten = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        lUsername = new javax.swing.JLabel();
 
         pkOrdnerErstellen.setAlwaysOnTop(true);
         pkOrdnerErstellen.setLocation(new java.awt.Point(100, 100));
+        pkOrdnerErstellen.setModal(true);
         pkOrdnerErstellen.setSize(new java.awt.Dimension(400, 300));
+        pkOrdnerErstellen.setType(java.awt.Window.Type.POPUP);
 
-        jLabel1.setText("kategorie");
+        jPanel2.setBackground(new java.awt.Color(204, 204, 204));
 
+        jLabel1.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabel1.setText("FOLDER");
+
+        btnPKOrdnerErstellen.setBackground(java.awt.Color.lightGray);
+        btnPKOrdnerErstellen.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnPKOrdnerErstellen.setForeground(java.awt.Color.white);
         btnPKOrdnerErstellen.setText("add");
         btnPKOrdnerErstellen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -170,12 +186,16 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        PKaddTf.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
         PKaddTf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PKaddTfActionPerformed(evt);
             }
         });
 
+        btnPKSchliessen.setBackground(java.awt.Color.lightGray);
+        btnPKSchliessen.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnPKSchliessen.setForeground(java.awt.Color.white);
         btnPKSchliessen.setText("cancel");
         btnPKSchliessen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -183,177 +203,284 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnPKOrdnerErstellen)
+                .addGap(18, 18, 18)
+                .addComponent(btnPKSchliessen)
+                .addGap(50, 50, 50))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(PKaddTf, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(80, 80, 80)
+                        .addComponent(jLabel1)))
+                .addContainerGap(9, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(5, 5, 5)
+                .addComponent(PKaddTf, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPKSchliessen)
+                    .addComponent(btnPKOrdnerErstellen))
+                .addContainerGap(22, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout pkOrdnerErstellenLayout = new javax.swing.GroupLayout(pkOrdnerErstellen.getContentPane());
         pkOrdnerErstellen.getContentPane().setLayout(pkOrdnerErstellenLayout);
         pkOrdnerErstellenLayout.setHorizontalGroup(
             pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
-                .addGroup(pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
-                        .addGap(145, 145, 145)
-                        .addComponent(jLabel1))
-                    .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
-                        .addGap(43, 43, 43)
-                        .addGroup(pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(pkOrdnerErstellenLayout.createSequentialGroup()
-                                .addComponent(btnPKOrdnerErstellen)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnPKSchliessen))
-                            .addComponent(PKaddTf, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(114, Short.MAX_VALUE))
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         pkOrdnerErstellenLayout.setVerticalGroup(
             pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pkOrdnerErstellenLayout.createSequentialGroup()
-                .addContainerGap(65, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(PKaddTf, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28)
-                .addGroup(pkOrdnerErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnPKOrdnerErstellen)
-                    .addComponent(btnPKSchliessen))
-                .addGap(78, 78, 78))
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
-        taNotizErstellen.setColumns(20);
-        taNotizErstellen.setRows(5);
-        jScrollPane2.setViewportView(taNotizErstellen);
+        pkNotizErstellen.setModal(true);
+        pkNotizErstellen.setResizable(false);
+        pkNotizErstellen.setSize(new java.awt.Dimension(432, 237));
+        pkNotizErstellen.setType(java.awt.Window.Type.POPUP);
 
-        btnPKNotizErstellen.setText("erstellen");
-        btnPKNotizErstellen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPKNotizErstellenActionPerformed(evt);
-            }
-        });
+        jPanel3.setBackground(new java.awt.Color(204, 204, 204));
 
-        btnPKNotizErstellenAbbrechen.setText("abbrechen");
-        btnPKNotizErstellenAbbrechen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPKNotizErstellenAbbrechenActionPerformed(evt);
-            }
-        });
-
+        tfNotizErstellenTitel.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
         tfNotizErstellenTitel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfNotizErstellenTitelActionPerformed(evt);
             }
         });
 
-        jLabel2.setText("Titel:");
+        jLabel2.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel2.setText("titel:");
 
-        jLabel3.setText("Inhalt:");
+        jLabel3.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel3.setText("content:");
+
+        taNotizErstellen.setColumns(20);
+        taNotizErstellen.setRows(5);
+        taNotizErstellen.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
+        jScrollPane2.setViewportView(taNotizErstellen);
+
+        btnPKNotizErstellen.setBackground(java.awt.Color.lightGray);
+        btnPKNotizErstellen.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnPKNotizErstellen.setText("create");
+        btnPKNotizErstellen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPKNotizErstellenActionPerformed(evt);
+            }
+        });
+
+        btnPKNotizErstellenAbbrechen.setBackground(java.awt.Color.lightGray);
+        btnPKNotizErstellenAbbrechen.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnPKNotizErstellenAbbrechen.setText("cancel");
+        btnPKNotizErstellenAbbrechen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPKNotizErstellenAbbrechenActionPerformed(evt);
+            }
+        });
+
+        label1.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        label1.setText("NOTE");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(18, 18, 18)
+                                .addComponent(tfNotizErstellenTitel, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(btnPKNotizErstellen)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnPKNotizErstellenAbbrechen))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(137, 137, 137)
+                        .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(tfNotizErstellenTitel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPKNotizErstellen)
+                    .addComponent(btnPKNotizErstellenAbbrechen))
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+
+        label1.getAccessibleContext().setAccessibleName("NOTE");
+        label1.getAccessibleContext().setAccessibleDescription("");
 
         javax.swing.GroupLayout pkNotizErstellenLayout = new javax.swing.GroupLayout(pkNotizErstellen.getContentPane());
         pkNotizErstellen.getContentPane().setLayout(pkNotizErstellenLayout);
         pkNotizErstellenLayout.setHorizontalGroup(
             pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
-                .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pkNotizErstellenLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2)
-                            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
-                                .addComponent(btnPKNotizErstellen)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnPKNotizErstellenAbbrechen)
-                                .addGap(0, 0, Short.MAX_VALUE))))
-                    .addGroup(pkNotizErstellenLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tfNotizErstellenTitel, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 168, Short.MAX_VALUE)))
-                .addContainerGap())
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pkNotizErstellenLayout.setVerticalGroup(
             pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pkNotizErstellenLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfNotizErstellenTitel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(pkNotizErstellenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnPKNotizErstellen)
-                    .addComponent(btnPKNotizErstellenAbbrechen))
-                .addContainerGap())
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        tfTitel.setEditable(false);
+        pkNotizBearbeiten.setModal(true);
+        pkNotizBearbeiten.setResizable(false);
+        pkNotizBearbeiten.setSize(new java.awt.Dimension(345, 250));
+        pkNotizBearbeiten.setType(java.awt.Window.Type.POPUP);
 
-        jLabel4.setText("Bearbeiten der Notiz: ");
+        jPanel4.setBackground(new java.awt.Color(204, 204, 204));
 
-        jLabel5.setText("Hier können sie den Text bearbeiten:");
+        jLabel5.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel5.setText("change content:");
 
         taNotizBearbeiten.setColumns(20);
         taNotizBearbeiten.setRows(5);
+        taNotizBearbeiten.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
         jScrollPane3.setViewportView(taNotizBearbeiten);
 
-        btnNotizBearbeitenSpeichern.setText("speichern");
+        btnNotizBearbeitenSpeichern.setBackground(java.awt.Color.lightGray);
+        btnNotizBearbeitenSpeichern.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnNotizBearbeitenSpeichern.setText("add");
         btnNotizBearbeitenSpeichern.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNotizBearbeitenSpeichernActionPerformed(evt);
             }
         });
 
-        btnNotizBearbeitenAbbrechen.setText("abbrechen");
+        btnNotizBearbeitenAbbrechen.setBackground(java.awt.Color.lightGray);
+        btnNotizBearbeitenAbbrechen.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnNotizBearbeitenAbbrechen.setText("cancel");
         btnNotizBearbeitenAbbrechen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNotizBearbeitenAbbrechenActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pkNotizBearbeitenLayout = new javax.swing.GroupLayout(pkNotizBearbeiten.getContentPane());
-        pkNotizBearbeiten.getContentPane().setLayout(pkNotizBearbeitenLayout);
-        pkNotizBearbeitenLayout.setHorizontalGroup(
-            pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
-                    .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
-                        .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(18, 18, 18)
-                                .addComponent(tfTitel, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel5)
-                            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
-                                .addComponent(btnNotizBearbeitenSpeichern)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnNotizBearbeitenAbbrechen)))
-                        .addGap(0, 71, Short.MAX_VALUE)))
-                .addContainerGap())
+        tfTitel.setEditable(false);
+        tfTitel.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
+
+        jLabel4.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel4.setText("change name:");
+
+        jLabel6.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabel6.setText("EDIT NOTE");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane3)
+                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                    .addComponent(jLabel4)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(tfTitel, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jLabel5)
+                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                    .addComponent(btnNotizBearbeitenSpeichern)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(btnNotizBearbeitenAbbrechen)))))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(65, 65, 65)
+                        .addComponent(jLabel6)))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
-        pkNotizBearbeitenLayout.setVerticalGroup(
-            pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfTitel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNotizBearbeitenSpeichern)
                     .addComponent(btnNotizBearbeitenAbbrechen))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addGap(12, 12, 12))
+        );
+
+        javax.swing.GroupLayout pkNotizBearbeitenLayout = new javax.swing.GroupLayout(pkNotizBearbeiten.getContentPane());
+        pkNotizBearbeiten.getContentPane().setLayout(pkNotizBearbeitenLayout);
+        pkNotizBearbeitenLayout.setHorizontalGroup(
+            pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pkNotizBearbeitenLayout.setVerticalGroup(
+            pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setLocation(new java.awt.Point(600, 200));
+        setResizable(false);
+        setSize(new java.awt.Dimension(1028, 490));
 
+        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+
+        btnNotizLoeschen.setBackground(java.awt.Color.lightGray);
+        btnNotizLoeschen.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnNotizLoeschen.setText("Notiz löschen");
+
+        taNotizInhalt.setEditable(false);
+        taNotizInhalt.setColumns(20);
+        taNotizInhalt.setRows(5);
+        taNotizInhalt.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
+        jScrollPane1.setViewportView(taNotizInhalt);
+        taNotizInhalt.getAccessibleContext().setAccessibleDescription("");
+
+        btnNoitzBearbeiten.setBackground(java.awt.Color.lightGray);
+        btnNoitzBearbeiten.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btnNoitzBearbeiten.setText("edit");
+        btnNoitzBearbeiten.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNoitzBearbeitenActionPerformed(evt);
+            }
+        });
+
+        lOrdner.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
         lOrdner.setModel(new DefaultListModel<String>());
         lOrdner.setToolTipText("");
         lOrdner.addAncestorListener(new javax.swing.event.AncestorListener() {
@@ -372,6 +499,7 @@ public class GUI extends javax.swing.JFrame {
         });
         scOrdner.setViewportView(lOrdner);
 
+        lNotizen.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.gray));
         lNotizen.setModel(new DefaultListModel<String>());
         lNotizen.setDragEnabled(true);
         lNotizen.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -381,6 +509,8 @@ public class GUI extends javax.swing.JFrame {
         });
         spNotizen.setViewportView(lNotizen);
 
+        btnopenPKadd.setBackground(java.awt.Color.lightGray);
+        btnopenPKadd.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         btnopenPKadd.setText("Ordner erstellen");
         btnopenPKadd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -388,6 +518,8 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        btnRemoveOrdner.setBackground(java.awt.Color.lightGray);
+        btnRemoveOrdner.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         btnRemoveOrdner.setText("Ordner löschen");
         btnRemoveOrdner.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -395,6 +527,8 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        btnNotizErstellen.setBackground(java.awt.Color.lightGray);
+        btnNotizErstellen.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         btnNotizErstellen.setText("Notiz erstellen");
         btnNotizErstellen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -402,28 +536,8 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        btnNotizLoeschen.setText("Notiz löschen");
-
-        taNotizInhalt.setEditable(false);
-        taNotizInhalt.setColumns(20);
-        taNotizInhalt.setRows(5);
-        jScrollPane1.setViewportView(taNotizInhalt);
-        taNotizInhalt.getAccessibleContext().setAccessibleDescription("");
-
-        btnNoitzBearbeiten.setText("bearbeiten");
-        btnNoitzBearbeiten.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNoitzBearbeitenActionPerformed(evt);
-            }
-        });
-
-        btnLogout.setText("logout");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutActionPerformed(evt);
-            }
-        });
-
+        jButton1.setBackground(java.awt.Color.lightGray);
+        jButton1.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         jButton1.setText("logout");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -431,58 +545,95 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+        jLabel7.setBackground(java.awt.Color.lightGray);
+        jLabel7.setForeground(java.awt.Color.lightGray);
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/notiz/app/test/source/icon4.png"))); // NOI18N
+        jLabel7.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/notiz/app/test/source/icon.png"))); // NOI18N
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lUsername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 55, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnopenPKadd)
                     .addComponent(btnRemoveOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnNotizLoeschen, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(btnLogout)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(btnNotizErstellen)
-                                .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnNoitzBearbeiten)))))
-                .addContainerGap(65, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnNotizErstellen)
+                    .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnNotizLoeschen, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnNoitzBearbeiten)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnNoitzBearbeiten)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnopenPKadd)
                     .addComponent(btnNotizErstellen))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRemoveOrdner)
-                    .addComponent(btnNotizLoeschen)
-                    .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
-                .addComponent(btnLogout)
-                .addGap(50, 50, 50))
+                    .addComponent(btnNotizLoeschen))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -495,39 +646,6 @@ public class GUI extends javax.swing.JFrame {
     private void btnRemoveOrdnerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveOrdnerActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnRemoveOrdnerActionPerformed
-
-    private void btnPKOrdnerErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKOrdnerErstellenActionPerformed
-        String neuerOrdnerName = PKaddTf.getText().trim();
-    if (neuerOrdnerName.isEmpty()) {
-        JOptionPane.showMessageDialog(rootPane, "Bitte geben Sie einen Ordnernamen ein.");
-        return;
-    }
-
-    Ordner newOrdner = new Ordner(neuerOrdnerName);
-    System.out.println("Objekt Ordner Name:" + newOrdner.getName());
-
-    // Füge den neuen Ordner in die Datenbank ein
-    try {
-        String benutzername = login.uebergebeuser().getName();
-        int ergebnis = konnektor.fuehreUpdateAus("INSERT INTO `Ordner` (`Name`, `Benutzername`) VALUES ('"+neuerOrdnerName+"', '"+benutzername+"');");
-        
-        // Ordner zur ArrayList und zum GUI-Model hinzufügen
-        ordnerArrayListe.add(newOrdner);
-        DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
-        model.addElement(newOrdner.getName());
-        PKaddTf.setText("");
-        pkOrdnerErstellen.hide();
-        
-        JOptionPane.showMessageDialog(rootPane, "Ordner erfolgreich hinzugefügt!");
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen des Ordners in die Datenbank: " + ex.getMessage());
-    }
-    }//GEN-LAST:event_btnPKOrdnerErstellenActionPerformed
-
-    private void btnPKSchliessenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKSchliessenActionPerformed
-        PKaddTf.setText("");
-        pkOrdnerErstellen.hide();
-    }//GEN-LAST:event_btnPKSchliessenActionPerformed
 
     private void lOrdnerValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lOrdnerValueChanged
         if(printOrdner == true){
@@ -548,12 +666,8 @@ public class GUI extends javax.swing.JFrame {
         printOrdner =! printOrdner;
     }//GEN-LAST:event_lOrdnerValueChanged
 
-    private void PKaddTfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddTfActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_PKaddTfActionPerformed
-
     private void btnNoitzBearbeitenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNoitzBearbeitenActionPerformed
-        if(!(taNotizInhalt.getText().equals("keine Notiz ausgewählt"))){
+        if(!(taNotizInhalt.getText().equals("keine Notiz ausgewählt") && !taNotizInhalt.getText().trim().isEmpty())){
             pkNotizBearbeiten.show();
             taNotizBearbeiten.setText(taNotizInhalt.getText());
             tfTitel.setText(lNotizen.getSelectedValue());
@@ -567,6 +681,7 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNotizErstellenActionPerformed
 
     private void btnPKNotizErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKNotizErstellenActionPerformed
+    if(!tfNotizErstellenTitel.getText().trim().isEmpty()){    
         String ausgewaehlterOrdner = lOrdner.getSelectedValue();
         String content =  taNotizErstellen.getText();
         String title = tfNotizErstellenTitel.getText();
@@ -587,12 +702,16 @@ public class GUI extends javax.swing.JFrame {
     }
     
         
-        taNotizErstellen.setText("");
+        taNotizErstellen.setText(null);
+        tfNotizErstellenTitel.setText(null);
         pkNotizErstellen.hide();
+    }
     }//GEN-LAST:event_btnPKNotizErstellenActionPerformed
 
     private void btnPKNotizErstellenAbbrechenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKNotizErstellenAbbrechenActionPerformed
         pkNotizErstellen.hide();
+        taNotizErstellen.setText(null);
+        tfNotizErstellenTitel.setText(null);
     }//GEN-LAST:event_btnPKNotizErstellenAbbrechenActionPerformed
 
     private void tfNotizErstellenTitelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNotizErstellenTitelActionPerformed
@@ -623,6 +742,7 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNotizBearbeitenAbbrechenActionPerformed
 
     private void btnNotizBearbeitenSpeichernActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotizBearbeitenSpeichernActionPerformed
+    if(!taNotizBearbeiten.getText().trim().isEmpty()){
         String content = taNotizBearbeiten.getText();
         try {
             
@@ -632,19 +752,51 @@ public class GUI extends javax.swing.JFrame {
     } catch (SQLException ex) {
         JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen der Notiz in die Datenbank: " + ex.getMessage());
     }
+    }
     }//GEN-LAST:event_btnNotizBearbeitenSpeichernActionPerformed
-
-    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        dispose();
-        login login = new login();
-        login.setVisible(true);
-    }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         dispose();
         login login = new login();
         login.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnPKSchliessenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKSchliessenActionPerformed
+        PKaddTf.setText(null);
+        pkOrdnerErstellen.hide();
+    }//GEN-LAST:event_btnPKSchliessenActionPerformed
+
+    private void PKaddTfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PKaddTfActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_PKaddTfActionPerformed
+
+    private void btnPKOrdnerErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKOrdnerErstellenActionPerformed
+        String neuerOrdnerName = PKaddTf.getText().trim();
+        if (neuerOrdnerName.isEmpty()) {
+            JOptionPane.showMessageDialog(rootPane, "Bitte geben Sie einen Ordnernamen ein.");
+            return;
+        }
+
+        Ordner newOrdner = new Ordner(neuerOrdnerName);
+        System.out.println("Objekt Ordner Name:" + newOrdner.getName());
+
+        // Füge den neuen Ordner in die Datenbank ein
+        try {
+            String benutzername = login.uebergebeuser().getUsername();
+            int ergebnis = konnektor.fuehreUpdateAus("INSERT INTO `Ordner` (`Name`, `Benutzername`) VALUES ('"+neuerOrdnerName+"', '"+benutzername+"');");
+
+            // Ordner zur ArrayList und zum GUI-Model hinzufügen
+            ordnerArrayListe.add(newOrdner);
+            DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
+            model.addElement(newOrdner.getName());
+            PKaddTf.setText(null);
+            pkOrdnerErstellen.hide();
+
+            JOptionPane.showMessageDialog(rootPane, "Ordner erfolgreich hinzugefügt!");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen des Ordners in die Datenbank: " + ex.getMessage());
+        }
+    }//GEN-LAST:event_btnPKOrdnerErstellenActionPerformed
 
     /**
      * @param args the command line arguments
@@ -683,7 +835,6 @@ public class GUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField PKaddTf;
-    private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnNoitzBearbeiten;
     private javax.swing.JButton btnNotizBearbeitenAbbrechen;
     private javax.swing.JButton btnNotizBearbeitenSpeichern;
@@ -701,11 +852,20 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JList<String> lNotizen;
     private javax.swing.JList<String> lOrdner;
+    private javax.swing.JLabel lUsername;
+    private java.awt.Label label1;
     private javax.swing.JDialog pkNotizBearbeiten;
     private javax.swing.JDialog pkNotizErstellen;
     private javax.swing.JDialog pkOrdnerErstellen;
