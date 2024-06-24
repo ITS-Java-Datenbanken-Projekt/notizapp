@@ -4,10 +4,13 @@
  */
 package notiz.app.test;
 
+import com.mysql.jdbc.PreparedStatement;
 import notiz.app.test.DatabaseConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.DefaultListModel;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -21,8 +24,8 @@ import notiz.app.test.DatabaseConnection;
  */
 public class GUI extends javax.swing.JFrame {
     
-    
-        private DatabaseConnection konnektor;
+    public ResultSet result;
+    private DatabaseConnection konnektor;
 
     /**
      * Creates new form GUI
@@ -38,12 +41,77 @@ public class GUI extends javax.swing.JFrame {
         } catch (ClassNotFoundException | SQLException ex) {
             JOptionPane.showMessageDialog(rootPane, "Fehler! Verbindung konnte nicht aufgebaut werden: " + ex);
         }
+        
+        initOrdner();
+        
     }
-    boolean printOrdner = true;
-    boolean printNotiz = true;
     
     ArrayList<Ordner> ordnerArrayListe = new ArrayList();
     ArrayList<Notiz> notizenArrayListe = new ArrayList();
+
+    
+    public void initNotizen(String ordnerName){
+    try {
+        result = this.konnektor.fuehreAbfrageAus("SELECT n.Titel, n.Inhalt FROM notiz n JOIN Ordner o ON n.Ordner_ID = o.Ordner_ID JOIN user u ON o.Benutzername = u.Benutzername WHERE u.Benutzername = '" + login.uebergebeuser().getUsername() + "' AND o.Name = '" + ordnerName + "';");
+        while(result.next()) {
+            String titel = result.getString("Titel");
+            String inhalt = result.getString("Inhalt");
+            System.out.println(titel + inhalt);
+            Notiz notiz = new Notiz(ordnerName, titel, inhalt);
+            notizenArrayListe.add(notiz);
+        }
+    } catch(SQLException ex){
+        JOptionPane.showMessageDialog(rootPane, "Error during database query:" + ex);
+    }
+}
+    
+    public void initOrdner() {
+    try {
+        // SQL-Abfrage, um die Ordner aus der Datenbank zu laden
+        result = this.konnektor.fuehreAbfrageAus("SELECT `Name` FROM `Ordner`;");
+
+        // Das Modell der JList für die Ordner holen
+        DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
+        model.clear(); // Das Modell leeren, bevor neue Elemente hinzugefügt werden
+
+        // Die Ergebnisse der Abfrage durchlaufen
+        while (result.next()) {
+            // Ordnername aus dem ResultSet holen
+            String ordnerName = result.getString("Name");
+
+            // Neuen Ordner erstellen und zur ArrayListe hinzufügen
+            Ordner ordner = new Ordner(ordnerName);
+            ordnerArrayListe.add(ordner);
+
+            // Den Ordner zur JList hinzufügen
+            model.addElement(ordner.getName());
+        }
+    } catch (SQLException ex) {
+        // Fehlermeldung anzeigen, wenn die Abfrage fehlschlägt
+        JOptionPane.showMessageDialog(rootPane, "Fehler bei der Datenbankabfrage: " + ex);
+    }
+}
+    
+    public int getOrdner_ID(String ordnerName){
+        int ordner_ID = 0;
+        
+        try {
+            result = this.konnektor.fuehreAbfrageAus("SELECT `Ordner_ID` FROM `Ordner` WHERE `Name` = '" + ordnerName + "';");
+            if(result.next()){
+                ordner_ID = Integer.parseInt(result.getString("Ordner_ID"));
+            }
+        }catch (SQLException ex){
+        // Fehlermeldung anzeigen, wenn die Abfrage fehlschlägt
+        JOptionPane.showMessageDialog(rootPane, "Fehler bei der Datenbankabfrage für den Ordner_ID: " + ex);
+    }
+        
+        return ordner_ID;
+    }
+
+
+    
+    boolean printOrdner = true;
+    boolean printNotiz = true;
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -67,21 +135,31 @@ public class GUI extends javax.swing.JFrame {
         tfNotizErstellenTitel = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        pkNotizBearbeiten = new javax.swing.JDialog();
+        tfTitel = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        taNotizBearbeiten = new javax.swing.JTextArea();
+        btnNotizBearbeitenSpeichern = new javax.swing.JButton();
+        btnNotizBearbeitenAbbrechen = new javax.swing.JButton();
         scOrdner = new javax.swing.JScrollPane();
         lOrdner = new javax.swing.JList<>();
         spNotizen = new javax.swing.JScrollPane();
         lNotizen = new javax.swing.JList<>();
         btnopenPKadd = new javax.swing.JButton();
+        btnRemoveOrdner = new javax.swing.JButton();
         btnNotizErstellen = new javax.swing.JButton();
+        btnNotizLoeschen = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         taNotizInhalt = new javax.swing.JTextArea();
         btnNoitzBearbeiten = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
 
         pkOrdnerErstellen.setAlwaysOnTop(true);
         pkOrdnerErstellen.setLocation(new java.awt.Point(100, 100));
-        pkOrdnerErstellen.setSize(new java.awt.Dimension(400, 299));
-        pkOrdnerErstellen.setType(java.awt.Window.Type.POPUP);
+        pkOrdnerErstellen.setSize(new java.awt.Dimension(400, 300));
 
         jLabel1.setText("kategorie");
 
@@ -137,9 +215,6 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(btnPKSchliessen))
                 .addGap(78, 78, 78))
         );
-
-        pkNotizErstellen.setSize(new java.awt.Dimension(432, 237));
-        pkNotizErstellen.setType(java.awt.Window.Type.POPUP);
 
         taNotizErstellen.setColumns(20);
         taNotizErstellen.setRows(5);
@@ -213,10 +288,83 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        tfTitel.setEditable(false);
+
+        jLabel4.setText("Bearbeiten der Notiz: ");
+
+        jLabel5.setText("Hier können sie den Text bearbeiten:");
+
+        taNotizBearbeiten.setColumns(20);
+        taNotizBearbeiten.setRows(5);
+        jScrollPane3.setViewportView(taNotizBearbeiten);
+
+        btnNotizBearbeitenSpeichern.setText("speichern");
+        btnNotizBearbeitenSpeichern.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNotizBearbeitenSpeichernActionPerformed(evt);
+            }
+        });
+
+        btnNotizBearbeitenAbbrechen.setText("abbrechen");
+        btnNotizBearbeitenAbbrechen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNotizBearbeitenAbbrechenActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pkNotizBearbeitenLayout = new javax.swing.GroupLayout(pkNotizBearbeiten.getContentPane());
+        pkNotizBearbeiten.getContentPane().setLayout(pkNotizBearbeitenLayout);
+        pkNotizBearbeitenLayout.setHorizontalGroup(
+            pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
+                    .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
+                        .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(18, 18, 18)
+                                .addComponent(tfTitel, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel5)
+                            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
+                                .addComponent(btnNotizBearbeitenSpeichern)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnNotizBearbeitenAbbrechen)))
+                        .addGap(0, 71, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        pkNotizBearbeitenLayout.setVerticalGroup(
+            pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pkNotizBearbeitenLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfTitel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pkNotizBearbeitenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNotizBearbeitenSpeichern)
+                    .addComponent(btnNotizBearbeitenAbbrechen))
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lOrdner.setModel(new DefaultListModel<String>());
         lOrdner.setToolTipText("");
+        lOrdner.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                lOrdnerAncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
         lOrdner.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 lOrdnerValueChanged(evt);
@@ -240,12 +388,21 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        btnRemoveOrdner.setText("Ordner löschen");
+        btnRemoveOrdner.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveOrdnerActionPerformed(evt);
+            }
+        });
+
         btnNotizErstellen.setText("Notiz erstellen");
         btnNotizErstellen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNotizErstellenActionPerformed(evt);
             }
         });
+
+        btnNotizLoeschen.setText("Notiz löschen");
 
         taNotizInhalt.setEditable(false);
         taNotizInhalt.setColumns(20);
@@ -257,6 +414,13 @@ public class GUI extends javax.swing.JFrame {
         btnNoitzBearbeiten.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNoitzBearbeitenActionPerformed(evt);
+            }
+        });
+
+        btnLogout.setText("logout");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
             }
         });
 
@@ -275,20 +439,25 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnopenPKadd))
+                    .addComponent(btnopenPKadd)
+                    .addComponent(btnRemoveOrdner, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnNotizErstellen)
-                    .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnNoitzBearbeiten))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnNotizLoeschen, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(btnLogout)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(btnNotizErstellen)
+                                .addComponent(spNotizen, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnNoitzBearbeiten)))))
                 .addContainerGap(65, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(30, 30, 30))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -306,9 +475,14 @@ public class GUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnopenPKadd)
                     .addComponent(btnNotizErstellen))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 235, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(25, 25, 25))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRemoveOrdner)
+                    .addComponent(btnNotizLoeschen)
+                    .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
+                .addComponent(btnLogout)
+                .addGap(50, 50, 50))
         );
 
         pack();
@@ -318,16 +492,36 @@ public class GUI extends javax.swing.JFrame {
         pkOrdnerErstellen.show();
     }//GEN-LAST:event_btnopenPKaddActionPerformed
 
+    private void btnRemoveOrdnerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveOrdnerActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRemoveOrdnerActionPerformed
+
     private void btnPKOrdnerErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKOrdnerErstellenActionPerformed
-        String neuerOrdner = PKaddTf.getText().trim();
-        Ordner newOrdner = new Ordner(neuerOrdner);
-        System.out.println("Objekt Ordner Name:" + newOrdner.getName());
-        ordnerArrayListe.add(newOrdner);
+        String neuerOrdnerName = PKaddTf.getText().trim();
+    if (neuerOrdnerName.isEmpty()) {
+        JOptionPane.showMessageDialog(rootPane, "Bitte geben Sie einen Ordnernamen ein.");
+        return;
+    }
+
+    Ordner newOrdner = new Ordner(neuerOrdnerName);
+    System.out.println("Objekt Ordner Name:" + newOrdner.getName());
+
+    // Füge den neuen Ordner in die Datenbank ein
+    try {
+        String benutzername = login.uebergebeuser().getName();
+        int ergebnis = konnektor.fuehreUpdateAus("INSERT INTO `Ordner` (`Name`, `Benutzername`) VALUES ('"+neuerOrdnerName+"', '"+benutzername+"');");
         
+        // Ordner zur ArrayList und zum GUI-Model hinzufügen
+        ordnerArrayListe.add(newOrdner);
         DefaultListModel<String> model = (DefaultListModel<String>) lOrdner.getModel();
         model.addElement(newOrdner.getName());
         PKaddTf.setText("");
         pkOrdnerErstellen.hide();
+        
+        JOptionPane.showMessageDialog(rootPane, "Ordner erfolgreich hinzugefügt!");
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen des Ordners in die Datenbank: " + ex.getMessage());
+    }
     }//GEN-LAST:event_btnPKOrdnerErstellenActionPerformed
 
     private void btnPKSchliessenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPKSchliessenActionPerformed
@@ -338,21 +532,18 @@ public class GUI extends javax.swing.JFrame {
     private void lOrdnerValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lOrdnerValueChanged
         if(printOrdner == true){
             String selectedValue = lOrdner.getSelectedValue();
+            notizenArrayListe.clear();
+            initNotizen(selectedValue);
             // Führen Sie die gewünschte Aktion aus
             System.out.println("Ausgewählter Eintrag: " + selectedValue);
             
             DefaultListModel<String> notizenListe = (DefaultListModel<String>) lNotizen.getModel();
             notizenListe.clear();
-            taNotizInhalt.setText("");
+            taNotizInhalt.setText("keine Notiz ausgewählt");
             
             for(int i = 0; i<notizenArrayListe.size(); i++){
-                if(notizenArrayListe.get(i).getName() == selectedValue){
-                    notizenListe.addElement(notizenArrayListe.get(i).getTitle());
-                    lNotizen.setSelectedValue(ABORT, printOrdner);
-                    taNotizInhalt.setText(notizenArrayListe.get(i).getContent());
-                }
+                notizenListe.addElement(notizenArrayListe.get(i).getTitle());
             }
-            
         }
         printOrdner =! printOrdner;
     }//GEN-LAST:event_lOrdnerValueChanged
@@ -362,7 +553,13 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_PKaddTfActionPerformed
 
     private void btnNoitzBearbeitenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNoitzBearbeitenActionPerformed
-        // TODO add your handling code here:
+        if(!(taNotizInhalt.getText().equals("keine Notiz ausgewählt"))){
+            pkNotizBearbeiten.show();
+            taNotizBearbeiten.setText(taNotizInhalt.getText());
+            tfTitel.setText(lNotizen.getSelectedValue());
+        }else{
+            JOptionPane.showMessageDialog(rootPane, "Du hast keine Notiz ausgewählt!");
+        }
     }//GEN-LAST:event_btnNoitzBearbeitenActionPerformed
 
     private void btnNotizErstellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotizErstellenActionPerformed
@@ -376,6 +573,19 @@ public class GUI extends javax.swing.JFrame {
         
         Notiz neueNotiz = new Notiz(ausgewaehlterOrdner, title, content);
         notizenArrayListe.add(neueNotiz);
+        DefaultListModel<String> notizenListe = (DefaultListModel<String>) lNotizen.getModel();
+        notizenListe.addElement(title);
+        taNotizInhalt.setText(content);
+        
+        try {
+            
+        int ergebnis = konnektor.fuehreUpdateAus("INSERT INTO `notiz` (`Titel`, `Inhalt`, `Ordner_ID`) VALUES ('"+title+"', '"+content+"', "+getOrdner_ID(ausgewaehlterOrdner)+");");
+        
+        JOptionPane.showMessageDialog(rootPane, "Notiz erfolgreich hinzugefügt!");
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen der Notiz in die Datenbank: " + ex.getMessage());
+    }
+    
         
         taNotizErstellen.setText("");
         pkNotizErstellen.hide();
@@ -403,6 +613,32 @@ public class GUI extends javax.swing.JFrame {
         }
         printNotiz =! printNotiz;
     }//GEN-LAST:event_lNotizenValueChanged
+
+    private void lOrdnerAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_lOrdnerAncestorAdded
+        
+    }//GEN-LAST:event_lOrdnerAncestorAdded
+
+    private void btnNotizBearbeitenAbbrechenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotizBearbeitenAbbrechenActionPerformed
+        pkNotizBearbeiten.hide();
+    }//GEN-LAST:event_btnNotizBearbeitenAbbrechenActionPerformed
+
+    private void btnNotizBearbeitenSpeichernActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotizBearbeitenSpeichernActionPerformed
+        String content = taNotizBearbeiten.getText();
+        try {
+            
+        int ergebnis = konnektor.fuehreUpdateAus("Update `notiz`  SET `Inhalt` = '" + content + "' WHERE `Ordner_ID` = " + getOrdner_ID(lOrdner.getSelectedValue()) + ";");
+        taNotizInhalt.setText(content);
+        JOptionPane.showMessageDialog(rootPane, "Notiz erfolgreich hinzugefügt!");
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(rootPane, "Fehler beim Hinzufügen der Notiz in die Datenbank: " + ex.getMessage());
+    }
+    }//GEN-LAST:event_btnNotizBearbeitenSpeichernActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+        dispose();
+        login login = new login();
+        login.setVisible(true);
+    }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         dispose();
@@ -447,27 +683,38 @@ public class GUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField PKaddTf;
+    private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnNoitzBearbeiten;
+    private javax.swing.JButton btnNotizBearbeitenAbbrechen;
+    private javax.swing.JButton btnNotizBearbeitenSpeichern;
     private javax.swing.JButton btnNotizErstellen;
+    private javax.swing.JButton btnNotizLoeschen;
     private javax.swing.JButton btnPKNotizErstellen;
     private javax.swing.JButton btnPKNotizErstellenAbbrechen;
     private javax.swing.JButton btnPKOrdnerErstellen;
     private javax.swing.JButton btnPKSchliessen;
+    private javax.swing.JButton btnRemoveOrdner;
     private javax.swing.JButton btnopenPKadd;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JList<String> lNotizen;
     private javax.swing.JList<String> lOrdner;
+    private javax.swing.JDialog pkNotizBearbeiten;
     private javax.swing.JDialog pkNotizErstellen;
     private javax.swing.JDialog pkOrdnerErstellen;
     private javax.swing.JScrollPane scOrdner;
     private javax.swing.JScrollPane spNotizen;
+    private javax.swing.JTextArea taNotizBearbeiten;
     private javax.swing.JTextArea taNotizErstellen;
     private javax.swing.JTextArea taNotizInhalt;
     private javax.swing.JTextField tfNotizErstellenTitel;
+    private javax.swing.JTextField tfTitel;
     // End of variables declaration//GEN-END:variables
 }
